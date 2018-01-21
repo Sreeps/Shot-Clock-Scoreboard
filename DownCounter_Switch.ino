@@ -55,6 +55,7 @@ void StartClock(int prev_state){
     digitalWrite(B[5], int_highlow(state_str[6]));
     digitalWrite(B[6], int_highlow(state_str[5]));
     digitalWrite(B[7], int_highlow(state_str[4]));
+    RunClock(prev_state);
 
 }
 
@@ -64,30 +65,37 @@ void StopClock(){
   
   // Obtaining the stopped state and converting that to BCD.
   stop_flag = 0;
-  String state_stp = "";
-  for(int j = 0; j < 8; j++)
-    state_stp[j] = char(highlow_int(digitalRead(B[j])));
-  prev_state = state_stp.toInt();
-
+  int state_stp = 0;
+  int state_stp1 = 0;
+  for(int j = 0; j < 4; j++)
+    //state_stp[j] = char(highlow_int(digitalRead(B[j])));
+    state_stp += digitalRead(B[j]) << j;
+  for(int j = 4; j < 8; j++)
+    state_stp1 += digitalRead(B[j]) << (j-4); 
+  prev_state = state_stp * 10 + state_stp1; 
   // Wait for any button (Start or Reset) to be pressed
-  while(digitalRead_v2(rst, buttons, 2) == HIGH or digitalRead_v2(str, buttons, 0) == HIGH){
+  while(digitalRead_v2(str, buttons, 0) == HIGH | digitalRead_v2(rst, buttons, 2) == HIGH){
     
     // Do nothing. But what if the start or reset is pressed?
     if(buttons[0] == LOW){
+        Serial.println(buttons[0]);
+        Serial.println(buttons[1]);
+        Serial.println(buttons[2]);
+        Serial.println(prev_state);
+        StartClock(prev_state);
+        buttons[2] = buttons[1] = buttons[0] = HIGH;
+        return;
+    }
+    if(buttons[2] == LOW){
+      Serial.println("Second condition");
+      buttons[2] = HIGH;
       Serial.println(buttons[0]);
       Serial.println(buttons[1]);
       Serial.println(buttons[2]);
-      StartClock(prev_state);
-      buttons[2] = buttons[1] = buttons[0] = HIGH;
-      break;
-    }
-    else if(buttons[2] == LOW){
       ResetClock();
       buttons[2] = buttons[1] = buttons[0] = HIGH;
-      break;
+      return;
     }
-    
-    else
       ;// Now you do nothing!
   }
 }
@@ -271,9 +279,15 @@ void loop(){
     Serial.println("Final condition inside loop");
     // Wait for start to be pressed.
     while(digitalRead_v2(str, buttons, 0) == HIGH){
-      Serial.println(buttons[0]);// Do Nothing (for now)
+      Serial.print(buttons[0]);
+      Serial.print("\t");
+      Serial.print(buttons[1]);
+      Serial.print("\t");
+      Serial.println(buttons[2]);// Do Nothing (for now)
     }
-    buttons[0] = buttons[1] = buttons[2] = HIGH;    
+    buttons[0] = buttons[1] = buttons[2] = HIGH;   
+    StartClock(prev_state);
+    RunClock(prev_state); 
   }
 }
 
