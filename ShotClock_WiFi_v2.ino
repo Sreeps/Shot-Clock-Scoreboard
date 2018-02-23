@@ -13,6 +13,7 @@ const char* password = "12345678";
 // Creating an instance of the server and the client
 WiFiServer server(80);
 WiFiClient client;
+//Stream.setTimeout(10);
 String request;
 
 int prev_state = 24;
@@ -72,53 +73,32 @@ void StopClock(){
   // Wait for any button (Start or Reset) to be pressed 
   while(1){
 
+    client.setTimeout(100);
     request = client.readStringUntil('\r');
     if(request.indexOf(str) != -1){
         start_flag = 1;
-        client.println("HTTP/1.1 200 OK");
-        client.println("Content-Type: text/html");
-        client.println("");
-        client.println("<!DOCTYPE HTML>");
-        client.println("<html>");
-        client.println("<br>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
-        client.print("</html>");
         break;
     }
     else if(request.indexOf(rst24) != -1){
       reset24_flag = 1;
-      client.println("HTTP/1.1 200 OK");
-      client.println("Content-Type: text/html");
-      client.println("");
-      client.println("<!DOCTYPE HTML>");
-      client.println("<html>");
-      client.println("<br>");
-      client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
-      client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
-      client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
-      client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
-      client.print("</html>");
       break;
     }
     else if(request.indexOf(rst14) != -1){
       reset14_flag = 1;
-      client.println("HTTP/1.1 200 OK");
-      client.println("Content-Type: text/html");
-      client.println("");
-      client.println("<!DOCTYPE HTML>");
-      client.println("<html>");
-      client.println("<br>");
-      client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
-      client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
-      client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
-      client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
-      client.print("</html>");
       break;
     }
     client.flush();
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println("<!DOCTYPE HTML>");
+    client.println("<html>");
+    client.println("<br>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+    client.print("</html>");
   }
   client.flush();
   if(start_flag == 1)
@@ -177,6 +157,8 @@ void RunClock(int prev_state){
     digitalWrite(B[7], HIGH);
     
     while(1){
+
+      client.setTimeout(100);
       request = client.readStringUntil('\r'); // Wait until reset is pressed to start the clock again.
       if(request.indexOf(rst24) != -1){
         Serial.println("Reset 24 pressed");
@@ -205,57 +187,37 @@ void RunClock(int prev_state){
   for(int i = prev_state; i >= 0; i --){
 
     Serial.println("Inside Run Clock loop");
+    client.setTimeout(100);
     request = client.readStringUntil('\r');
     if(request.indexOf(rst24) != -1){
         Serial.println("Checking if reset is pressed when running");
         reset24_flag = 1;
-        client.println("HTTP/1.1 200 OK");
-        client.println("Content-Type: text/html");
-        client.println("");
-        client.println("<!DOCTYPE HTML>");
-        client.println("<html>");
-        client.println("<br>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
-        client.print("</html>");
         break;
     }   
     else if(request.indexOf(rst14) != -1){
         Serial.println("Checking if stop is pressed when running");
         reset14_flag = 1;
-        client.println("HTTP/1.1 200 OK");
-        client.println("Content-Type: text/html");
-        client.println("");
-        client.println("<!DOCTYPE HTML>");
-        client.println("<html>");
-        client.println("<br>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
-        client.print("</html>");
         break;
     }
     else if(request.indexOf(stp) != -1){
         Serial.println("Checking if stop is pressed when running");
         stop_flag = 1;
-        client.println("HTTP/1.1 200 OK");
-        client.println("Content-Type: text/html");
-        client.println("");
-        client.println("<!DOCTYPE HTML>");
-        client.println("<html>");
-        client.println("<br>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
-        client.print("</html>");
         break;
     }
     client.flush();
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println("<!DOCTYPE HTML>");
+    client.println("<html>");
+    client.println("<br>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+    client.print("</html>");
     
+    Serial.println("No button pressed. Continue running");
     int bcd = (i / 10 * 16) + (i % 10);
     String state = String(bcd,BIN);
     int z = 8 - state.length();
@@ -269,7 +231,16 @@ void RunClock(int prev_state){
     digitalWrite(B[5], int_highlow(state[5]));
     digitalWrite(B[6], int_highlow(state[6]));
     digitalWrite(B[7], int_highlow(state[7]));
-    delay(1000);
+    delay(900);
+  }
+  if(reset24_flag == 1){
+    ResetClock_24();
+  }
+  else if(reset14_flag == 1){
+    ResetClock_14();
+  }
+  else if(stop_flag == 1){
+    StopClock();
   }
   if(digitalRead(B[0]) == LOW and digitalRead(B[1]) == LOW and digitalRead(B[2]) == LOW and digitalRead(B[3]) == LOW and digitalRead(B[4]) == LOW and digitalRead(B[5]) == LOW and digitalRead(B[6]) == LOW and digitalRead(B[7]) == LOW ){
     
@@ -284,24 +255,26 @@ void RunClock(int prev_state){
     digitalWrite(B[7], HIGH);
 
     while(1){
+
+      client.setTimeout(100);
       request = client.readStringUntil('\r'); // Wait until reset is pressed to start the clock again.
       if(request.indexOf(rst24) != -1){
         Serial.println("Reset 24 pressed");
         reset24_flag = 1;
-        client.println("HTTP/1.1 200 OK");
-        client.println("Content-Type: text/html");
-        client.println("");
-        client.println("<!DOCTYPE HTML>");
-        client.println("<html>");
-        client.println("<br>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
-        client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
-        client.print("</html>");
         break;   
       }
       client.flush();
+      client.println("HTTP/1.1 200 OK");
+      client.println("Content-Type: text/html");
+      client.println("");
+      client.println("<!DOCTYPE HTML>");
+      client.println("<html>");
+      client.println("<br>");
+      client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+      client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+      client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+      client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+      client.print("</html>");
     }
     client.flush();
     if(reset24_flag == 1)
@@ -337,6 +310,7 @@ void setup() {
     stop_flag = 0;    
     
     WiFi.begin(ssid, password);
+    //S.setTimeout(10);
     while(WiFi.status() != WL_CONNECTED){
       delay(500);
       Serial.print(".");
@@ -362,32 +336,118 @@ void loop() {
   while(!client.available()){
     delay(1);
   }
-
+  Serial.println("Taking a request");
+  client.setTimeout(100);
   request = client.readStringUntil('\r');
   if(request.indexOf(str) != -1 & flag == 0){ // Pressing start button for the first time
     flag = 1;
     prev_state = 24;
+    Serial.println("Start has been pressed");
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println("<!DOCTYPE HTML>");
+    client.println("<html>");
+    client.println("<br>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+    client.print("</html>");
+    client.flush();
     RunClock(prev_state);
   }
   else if((request.indexOf(rst24) != -1 & flag != 0) | reset24_flag == 1){ // Requesting clock reset to 24
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println("<!DOCTYPE HTML>");
+    client.println("<html>");
+    client.println("<br>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+    client.print("</html>");
+    client.flush();
     ResetClock_24();
     RunClock(prev_state); 
   }
   else if((request.indexOf(rst14) != -1 & flag != 0) | reset14_flag == 1){ // Requesting clock reset to 14
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println("<!DOCTYPE HTML>");
+    client.println("<html>");
+    client.println("<br>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+    client.print("</html>");
+    client.flush();
     ResetClock_14();
     RunClock(prev_state); 
   }
   else if((request.indexOf(str) != -1 & flag != 0) | start_flag == 1){ // Requesting clock start
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println("<!DOCTYPE HTML>");
+    client.println("<html>");
+    client.println("<br>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+    client.print("</html>");
+    client.flush();
     StartClock(prev_state);
     RunClock(prev_state); 
   }
   else if((request.indexOf(stp) != -1 & flag != 0) | stop_flag == 1){ // Requesting clock stop
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println("<!DOCTYPE HTML>");
+    client.println("<html>");
+    client.println("<br>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+    client.print("</html>");
+    client.flush();
     StopClock();
   }
   else if(request.indexOf("/") != -1 & flag == 0){ // Random button press
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println("<!DOCTYPE HTML>");
+    client.println("<html>");
+    client.println("<br>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+    client.print("</html>");
+    client.flush();
     ResetClock_24();
   }
   else if(request.indexOf("/") != -1 & flag != 0){ // Random button press
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println("<!DOCTYPE HTML>");
+    client.println("<html>");
+    client.println("<br>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
+    client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
+    client.print("</html>");
+    client.flush();
     ResetClock_24();
     RunClock(prev_state);
   }
@@ -395,17 +455,4 @@ void loop() {
     ;
   
   client.flush();
-
-  // Printing the HTML
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println("");
-  client.println("<!DOCTYPE HTML>");
-  client.println("<html>");
-  client.println("<br>");
-  client.println("<a href=\"http://192.168.43.72/BUTTON=Start\"><button>Start</button></a>");
-  client.println("<a href=\"http://192.168.43.72/BUTTON=Stop\"\"><button>Stop</button></a>");
-  client.println("<a href=\"http://192.168.43.72/BUTTON=Reset14\"\"><button>Reset14</button></a>");
-  client.println("<a href=\"http://192.168.43.72/BUTTON=Reset24\"\"><button>Reset24</button></a><br />");
-  client.print("</html>");
 }
